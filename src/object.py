@@ -41,6 +41,8 @@ class Category:
         self.description = description
         self.products = products
 
-        # Увеличиваем счетчики категорий и продуктов
+        # Увеличиваем общий счетчик категорий
         Category.category_count += 1
+
+        # Увеличиваем общий счетчик продуктов
         Category.product_count += len(products)
