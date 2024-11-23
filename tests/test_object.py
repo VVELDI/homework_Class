@@ -12,31 +12,60 @@ def test_product_creation():
     assert repr(product) == "(name='Laptop', price=1000.0, quantity=5)"
 
 
+def test_product_price_setter():
+    """Проверяем работу сеттера и геттера для цены."""
+    product = Product("Laptop", "Gaming laptop", 1000.0, 5)
+
+    # Проверяем установку корректной цены
+    product.price = 1200.0
+    assert product.price == 1200.0
+
+    # Проверяем сообщение об ошибке при попытке установить некорректную цену
+    product.price = -500.0
+    assert product.price == 1200.0  # Цена не должна была измениться
+
+
+def test_product_class_method():
+    """Проверяем создание объекта Product через класс-метод."""
+    product_data = {
+        "name": "Smartphone",
+        "description": "Latest model",
+        "price": 800.0,
+        "quantity": 3,
+    }
+
+    product = Product.new_product(product_data)
+
+    assert product.name == "Smartphone"
+    assert product.description == "Latest model"
+    assert product.price == 800.0
+    assert product.quantity == 3
+
+
 def test_category_creation():
     """Проверяем создание объекта Category и обновление атрибутов класса."""
     # Сбросим атрибуты класса перед тестами
     Category.category_count = 0
     Category.product_count = 0
 
-    # Создаем продукты
+    # Создаем категорию
+    category = Category("Electronics", "Electronic devices", [])
+
+    assert category.name == "Electronics"
+    assert category.description == "Electronic devices"
+    assert Category.category_count == 1
+    assert Category.product_count == 0  # Список продуктов изначально пуст
+
+    # Создаем продукты и добавляем их в категорию
     product1 = Product("Laptop", "Gaming laptop", 1000.0, 5)
     product2 = Product("Smartphone", "Latest model", 800.0, 3)
 
-    # Создаем категории
-    category1 = Category("Electronics", "Electronic devices", [product1, product2])
+    category.add_product(product1)
+    category.add_product(product2)
 
-    assert category1.name == "Electronics"
-    assert category1.description == "Electronic devices"
-    assert len(category1.products) == 2
-    assert Category.category_count == 1  # Одна категория
-    assert Category.product_count == 2  # Два продукта
-
-    # Проверяем создание второй категории
-    product3 = Product("Tablet", "High-performance tablet", 500.0, 2)
-    category2 = Category("Gadgets", "Portable devices", [product3])
-
-    assert category2.name == "Gadgets"
-    assert category2.description == "Portable devices"
-    assert len(category2.products) == 1
-    assert Category.category_count == 2  # Две категории
-    assert Category.product_count == 3  # Всего три продукта
+    # Проверяем обновление приватного списка и счетчика продуктов
+    assert Category.product_count == 2
+    assert category.products == (
+        "Laptop, 1000.0 руб. Остаток: 5 шт.\n"
+        "Smartphone, 800.0 руб. Остаток: 3 шт.\n"
+    )
