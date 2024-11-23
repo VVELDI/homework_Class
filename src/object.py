@@ -12,7 +12,7 @@ class Product:
         """
         self.name = name
         self.description = description
-        self._price = price  # Цена становится приватной
+        self.__price = price  # Цена становится приватной
         self.quantity = quantity
 
     def __repr__(self):
@@ -20,7 +20,7 @@ class Product:
         Возвращает строковое представление объекта Product.
         """
         return (f"(name='{self.name}', "
-                f"price={self._price}, "
+                f"price={self.__price}, "
                 f"quantity={self.quantity})")
 
     @classmethod
@@ -43,7 +43,7 @@ class Product:
         """
         Геттер для получения значения цены.
         """
-        return self._price
+        return self.__price
 
     @price.setter
     def price(self, value: float):
@@ -53,7 +53,7 @@ class Product:
         if value <= 0:
             print("Цена не должна быть нулевая или отрицательная")
         else:
-            self._price = value
+            self.__price = value
 
 
 class Category:
