@@ -90,12 +90,7 @@ class Category:
 
     @property
     def products(self):
-        """
-        Геттер для получения списка товаров категории.
-
-        :return: Строковое представление списка товаров
-        """
-        return '\n'.join(
-            f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт."
+        return "".join(
+            f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
             for product in self._products
-        )
+        ).strip() + "\n"
