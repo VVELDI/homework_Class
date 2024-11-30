@@ -1,5 +1,3 @@
-# src/objects.py
-
 class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int):
         """
@@ -22,6 +20,22 @@ class Product:
         return (f"(name='{self.name}', "
                 f"price={self.__price}, "
                 f"quantity={self.quantity})")
+
+    def __str__(self):
+        """
+        Строковое представление продукта в формате:
+        'Название продукта, 80 руб. Остаток: 15 шт.'
+        """
+        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        """
+        Реализация сложения для продуктов.
+        Сумма равна общей стоимости всех товаров.
+        """
+        if not isinstance(other, Product):
+            raise TypeError("Операция сложения возможна только между объектами класса Product.")
+        return (self.__price * self.quantity) + (other.__price * other.quantity)
 
     @classmethod
     def new_product(cls, data: dict):
@@ -79,6 +93,14 @@ class Category:
         # Увеличиваем общий счетчик продуктов
         Category.product_count += len(products)
 
+    def __str__(self):
+        """
+        Строковое представление категории в формате:
+        'Название категории, количество продуктов: 200 шт.'
+        """
+        total_quantity = sum(product.quantity for product in self._products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
     def add_product(self, product: Product):
         """
         Метод для добавления продукта в категорию.
@@ -90,7 +112,4 @@ class Category:
 
     @property
     def products(self):
-        return "".join(
-            f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
-            for product in self._products
-        ).strip() + "\n"
+        return "\n".join(str(product) for product in self._products) + "\n"
