@@ -1,3 +1,4 @@
+import pytest  # Убедитесь, что pytest импортирован
 from src.object import Product, Category
 
 
@@ -42,6 +43,26 @@ def test_product_class_method():
     assert product.quantity == 3
 
 
+def test_product_addition_with_invalid_type():
+    """Проверяем выброс исключения при попытке сложения с объектом другого типа."""
+    product = Product("Laptop", "Gaming laptop", 1000.0, 5)
+
+    # Попытка сложения с объектом другого типа
+    with pytest.raises(TypeError, match="Операция сложения возможна только между объектами класса Product."):
+        result = product + "Not a Product"
+
+
+def test_product_addition():
+    """Проверяем работу метода сложения __add__ между объектами Product."""
+    product1 = Product("Laptop", "Gaming laptop", 1000.0, 5)
+    product2 = Product("Smartphone", "Latest model", 800.0, 3)
+
+    result = product1 + product2
+
+    # Проверяем, что результат корректен
+    assert result == (1000.0 * 5) + (800.0 * 3)  # 5000 + 2400 = 7400
+
+
 def test_category_creation():
     """Проверяем создание объекта Category и обновление атрибутов класса."""
     # Сбросим атрибуты класса перед тестами
@@ -55,6 +76,7 @@ def test_category_creation():
     assert category.description == "Electronic devices"
     assert Category.category_count == 1
     assert Category.product_count == 0  # Список продуктов изначально пуст
+    assert str(category) == "Electronics, количество продуктов: 0 шт."
 
     # Создаем продукты и добавляем их в категорию
     product1 = Product("Laptop", "Gaming laptop", 1000.0, 5)
