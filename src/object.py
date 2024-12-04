@@ -23,7 +23,7 @@ class Product:
 
     def __add__(self, other):
         if type(self) != type(other):
-            raise TypeError("Сложение возможно только между объектами одного типа.")
+            raise TypeError("Операция сложения возможна только между объектами класса Product.")
         return (self.__price * self.quantity) + (other.__price * other.quantity)
 
     @classmethod

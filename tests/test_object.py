@@ -1,5 +1,6 @@
 import pytest  # Убедитесь, что pytest импортирован
-from src.object import Product, Category
+
+from src.object import Product, Category, Smartphone, LawnGrass
 
 
 def test_product_creation():
@@ -90,4 +91,97 @@ def test_category_creation():
     assert category.products == (
         "Laptop, 1000.0 руб. Остаток: 5 шт.\n"
         "Smartphone, 800.0 руб. Остаток: 3 шт.\n"
+    )
+
+
+def test_smartphone_creation():
+    """Проверяем создание объекта Smartphone и его представление."""
+    smartphone = Smartphone(
+        name="iPhone",
+        description="Latest iPhone model",
+        price=1200.0,
+        quantity=10,
+        efficiency="High",
+        model="iPhone 15 Pro",
+        memory=256,
+        color="Black"
+    )
+
+    assert smartphone.name == "iPhone"
+    assert smartphone.description == "Latest iPhone model"
+    assert smartphone.price == 1200.0
+    assert smartphone.quantity == 10
+    assert smartphone.efficiency == "High"
+    assert smartphone.model == "iPhone 15 Pro"
+    assert smartphone.memory == 256
+    assert smartphone.color == "Black"
+    assert repr(smartphone) == (
+        "(name='iPhone', price=1200.0, quantity=10), "
+        "efficiency='High', model='iPhone 15 Pro', memory=256 GB, color='Black'"
+    )
+
+
+def test_lawngrass_creation():
+    """Проверяем создание объекта LawnGrass и его представление."""
+    lawn_grass = LawnGrass(
+        name="Premium Grass",
+        description="High-quality lawn grass",
+        price=200.0,
+        quantity=50,
+        country="Netherlands",
+        germination_period=30,
+        color="Green"
+    )
+
+    assert lawn_grass.name == "Premium Grass"
+    assert lawn_grass.description == "High-quality lawn grass"
+    assert lawn_grass.price == 200.0
+    assert lawn_grass.quantity == 50
+    assert lawn_grass.country == "Netherlands"
+    assert lawn_grass.germination_period == 30
+    assert lawn_grass.color == "Green"
+    assert repr(lawn_grass) == (
+        "(name='Premium Grass', price=200.0, quantity=50), "
+        "country='Netherlands', germination_period=30 days, color='Green'"
+    )
+
+
+def test_category_with_different_products():
+    """Проверяем работу класса Category с разными типами продуктов."""
+    Category.category_count = 0
+    Category.product_count = 0
+
+    # Создаем продукты
+    smartphone = Smartphone(
+        name="Galaxy S22",
+        description="Samsung flagship",
+        price=1000.0,
+        quantity=15,
+        efficiency="High",
+        model="Galaxy S22 Ultra",
+        memory=512,
+        color="Blue"
+    )
+    lawn_grass = LawnGrass(
+        name="Eco Lawn",
+        description="Eco-friendly lawn grass",
+        price=150.0,
+        quantity=100,
+        country="USA",
+        germination_period=45,
+        color="Bright Green"
+    )
+
+    # Создаем категорию и добавляем продукты
+    category = Category("Mixed Goods", "Smartphones and Lawn Grass", [])
+    category.add_product(smartphone)
+    category.add_product(lawn_grass)
+
+    # Проверяем свойства категории
+    assert Category.category_count == 1
+    assert Category.product_count == 2
+    assert str(category) == "Mixed Goods, количество продуктов: 115 шт."
+    assert category.products == (
+        "Galaxy S22, 1000.0 руб. Остаток: 15 шт.\n"
+        "Eco Lawn, 150.0 руб. Остаток: 100 шт.\n"
     )
