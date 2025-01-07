@@ -22,28 +22,23 @@ class BaseProduct(ABC):
 
 # Класс-миксин, который выводит информацию о создании объекта
 class CreationLogMixin:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name: str, description: str, price: float, quantity: int):
         class_name = self.__class__.__name__
-        print(f"Создание {class_name} с параметрами: {args}, {kwargs}")
-        super().__init__(*args, **kwargs)
+        print(
+            f"Создание {class_name} с параметрами: name='{name}', description='{description}', price={price}, quantity={quantity}")
+        super().__init__()
 
 
 # Класс Product, который наследует от BaseProduct и включает миксин
 class Product(BaseProduct, CreationLogMixin):
     def __init__(self, name: str, description: str, price: float, quantity: int):
-        """
-        Класс описывает продукт.
-
-        :param name: Название продукта
-        :param description: Описание продукта
-        :param price: Цена продукта
-        :param quantity: Количество в наличии
-        """
-        super().__init__()  # Вызов конструктора миксина
-        self.name = name
-        self.description = description
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен.")
+        super().__init__(name, description, price, quantity)
         self.__price = price  # Цена становится приватной
         self.quantity = quantity
+        self.name = name
+        self.description = description
 
     def __repr__(self):
         return (f"(name='{self.name}', "
@@ -159,3 +154,12 @@ class Category:
     @property
     def products(self):
         return "\n".join(str(product) for product in self._products) + "\n"
+
+    def middle_price(self):
+        """Метод для подсчета средней цены товаров в категории."""
+        try:
+            total_price = sum(product.price for product in self._products)
+            average = total_price / len(self._products)
+        except ZeroDivisionError:
+            return 0
+        return average

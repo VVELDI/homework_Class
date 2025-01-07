@@ -1,5 +1,4 @@
 import pytest
-
 from src.object import Product, Smartphone, LawnGrass, Category
 
 
@@ -85,6 +84,24 @@ def test_product_add_stock_negative(product):
     assert product.quantity == 50  # Количество должно остаться прежним
 
 
+def test_product_initialization_zero_quantity():
+    """Проверяем инициализацию объекта Product с нулевым количеством"""
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен."):
+        Product("Бракованный товар", "Неверное количество", 100.0, 0)  # Ожидаем исключение
+
+
+def test_product_price_setter(product):
+    """Проверяем установку цены через сеттер"""
+    product.price = 200.0
+    assert product.price == 200.0
+
+
+def test_product_price_setter_negative(product):
+    """Проверяем установку отрицательной цены"""
+    product.price = -50.0
+    assert product.price == 100.0  # Цена должна остаться прежней
+
+
 def test_category_initialization(category):
     """Проверяем инициализацию объекта Category"""
     assert category.name == "Тестовая категория"
@@ -105,13 +122,26 @@ def test_category_add_invalid_product(category):
         category.add_product("Некорректный продукт")  # Ожидаем исключение
 
 
-def test_product_price_setter(product):
-    """Проверяем установку цены через сеттер"""
-    product.price = 200.0
-    assert product.price == 200.0
+def test_category_middle_price(category):
+    """Проверяем расчет средней цены в категории"""
+    assert category.middle_price() == 200.0  # (100 + 300) / 2 = 200
 
 
-def test_product_price_setter_negative(product):
-    """Проверяем установку отрицательной цены"""
-    product.price = -50.0
-    assert product.price == 100.0  # Цена должна остаться прежней
+def test_category_middle_price_empty():
+    """Проверяем расчет средней цены в пустой категории"""
+    empty_category = Category("Пустая категория", "Категория без продуктов", [])
+    assert empty_category.middle_price() == 0  # Ожидаем 0 для пустой категории
+
+
+def test_product_addition_raises_error_for_non_product():
+    """Проверяем, что возникает ошибка при добавлении не продукта"""
+    category = Category("Тестовая категория", "Описание категории", [])
+    with pytest.raises(TypeError):
+        category.add_product(None)  # Ожидаем исключение
+
+
+def test_product_addition_success(product):
+    """Проверяем, что продукт добавляется в категорию успешно"""
+    category = Category("Тестовая категория", "Описание категории", [])
+    category.add_product(product)
+    assert len(category._products) == 1
