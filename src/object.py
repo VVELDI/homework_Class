@@ -22,28 +22,24 @@ class BaseProduct(ABC):
 
 # Класс-миксин, который выводит информацию о создании объекта
 class CreationLogMixin:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name: str, description: str, price: float, quantity: int):
         class_name = self.__class__.__name__
-        print(f"Создание {class_name} с параметрами: {args}, {kwargs}")
-        super().__init__(*args, **kwargs)
+        print(
+            f"Создание {class_name} с параметрами: name='{name}', description='{description}', price={price}, quantity={quantity}")
+        super().__init__()
 
 
 # Класс Product, который наследует от BaseProduct и включает миксин
 class Product(BaseProduct, CreationLogMixin):
     def __init__(self, name: str, description: str, price: float, quantity: int):
-        """
-        Класс описывает продукт.
-
-        :param name: Название продукта
-        :param description: Описание продукта
-        :param price: Цена продукта
-        :param quantity: Количество в наличии
-        """
-        super().__init__()  # Вызов конструктора миксина
-        self.name = name
-        self.description = description
-        self.__price = price  # Цена становится приватной
-        self.quantity = quantity
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен.")
+        else:
+            super().__init__(name, description, price, quantity)
+            self.__price = price  # Цена становится приватной
+            self.quantity = quantity
+            self.name = name
+            self.description = description
 
     def __repr__(self):
         return (f"(name='{self.name}', "
@@ -74,18 +70,16 @@ class Product(BaseProduct, CreationLogMixin):
     @price.setter
     def price(self, value: float):
         if value <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
-        else:
-            self.__price = value
+            raise ValueError("Цена не должна быть нулевая или отрицательная")  # Изменено на выброс исключения
+        self.__price = value
 
     def get_info(self):
         return f"Продукт: {self.name}, цена: {self.__price}, количество: {self.quantity}"
 
     def add_stock(self, amount: int):
-        if amount > 0:
-            self.quantity += amount
-        else:
-            print("Количество добавляемого товара должно быть положительным.")
+        if amount <= 0:
+            raise ValueError("Количество добавляемого товара должно быть положительным.")
+        self.quantity += amount
 
 
 # Класс Smartphone, наследующий от Product
@@ -159,3 +153,10 @@ class Category:
     @property
     def products(self):
         return "\n".join(str(product) for product in self._products) + "\n"
+
+    def middle_price(self):
+        """Метод для подсчета средней цены товаров в категории."""
+        if not self._products:  # Проверка на пустой список
+            return 0
+        total_price = sum(product.price for product in self._products)
+        return total_price / len(self._products)
