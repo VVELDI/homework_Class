@@ -1,4 +1,35 @@
-class Product:
+from abc import ABC, abstractmethod
+
+
+# Базовый абстрактный класс для всех продуктов
+class BaseProduct(ABC):
+    @abstractmethod
+    def get_info(self):
+        """Метод для получения информации о продукте"""
+        pass
+
+    @property
+    @abstractmethod
+    def price(self):
+        """Свойство для доступа к цене продукта"""
+        pass
+
+    @abstractmethod
+    def add_stock(self, amount: int):
+        """Метод для добавления товаров на склад"""
+        pass
+
+
+# Класс-миксин, который выводит информацию о создании объекта
+class CreationLogMixin:
+    def __init__(self, *args, **kwargs):
+        class_name = self.__class__.__name__
+        print(f"Создание {class_name} с параметрами: {args}, {kwargs}")
+        super().__init__(*args, **kwargs)
+
+
+# Класс Product, который наследует от BaseProduct и включает миксин
+class Product(BaseProduct, CreationLogMixin):
     def __init__(self, name: str, description: str, price: float, quantity: int):
         """
         Класс описывает продукт.
@@ -8,6 +39,7 @@ class Product:
         :param price: Цена продукта
         :param quantity: Количество в наличии
         """
+        super().__init__()  # Вызов конструктора миксина
         self.name = name
         self.description = description
         self.__price = price  # Цена становится приватной
@@ -22,7 +54,7 @@ class Product:
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
-        if type(self) != type(other):
+        if not isinstance(other, Product):
             raise TypeError("Операция сложения возможна только между объектами класса Product.")
         return (self.__price * self.quantity) + (other.__price * other.quantity)
 
@@ -46,10 +78,21 @@ class Product:
         else:
             self.__price = value
 
+    def get_info(self):
+        return f"Продукт: {self.name}, цена: {self.__price}, количество: {self.quantity}"
 
+    def add_stock(self, amount: int):
+        if amount > 0:
+            self.quantity += amount
+        else:
+            print("Количество добавляемого товара должно быть положительным.")
+
+
+# Класс Smartphone, наследующий от Product
 class Smartphone(Product):
-    def __init__(self, name: str, description: str, price: float, quantity: int,
-                 efficiency: str, model: str, memory: int, color: str):
+    def __init__(self, name: str, description: str, price: float,
+                 quantity: int, efficiency: str, model: str,
+                 memory: int, color: str):
         super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
@@ -58,12 +101,20 @@ class Smartphone(Product):
 
     def __repr__(self):
         return (super().__repr__() +
-                f", efficiency='{self.efficiency}', model='{self.model}', memory={self.memory} GB, color='{self.color}'")
+                f", efficiency='{self.efficiency}', model='{self.model}', "
+                f"memory={self.memory} GB, color='{self.color}'")
+
+    def get_info(self):
+        return (super().get_info() +
+                f", эффективность: {self.efficiency}, модель: {self.model}, "
+                f"память: {self.memory}GB, цвет: {self.color}")
 
 
+# Класс LawnGrass, наследующий от Product
 class LawnGrass(Product):
-    def __init__(self, name: str, description: str, price: float, quantity: int,
-                 country: str, germination_period: int, color: str):
+    def __init__(self, name: str, description: str, price: float,
+                 quantity: int, country: str, germination_period: int,
+                 color: str):
         super().__init__(name, description, price, quantity)
         self.country = country
         self.germination_period = germination_period
@@ -73,7 +124,13 @@ class LawnGrass(Product):
         return (super().__repr__() +
                 f", country='{self.country}', germination_period={self.germination_period} days, color='{self.color}'")
 
+    def get_info(self):
+        return (super().get_info() +
+                f", страна: {self.country}, срок прорастания: {self.germination_period} дней, "
+                f"цвет: {self.color}")
 
+
+# Класс Category для управления продуктами
 class Category:
     category_count = 0
     product_count = 0
